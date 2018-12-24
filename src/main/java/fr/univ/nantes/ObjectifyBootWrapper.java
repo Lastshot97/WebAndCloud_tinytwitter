@@ -18,14 +18,15 @@ public class ObjectifyBootWrapper implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		ObjectifyService.init(new ObjectifyFactory(
+		//uncomment when deploying on the cloud
+		/*ObjectifyService.init(new ObjectifyFactory(
 			    DatastoreOptions.newBuilder()
 			        .setHost("http://localhost:8484")
 			        .setProjectId("tinytwittertp")
 			        .build()
 			        .getService()
-			));
-		//ObjectifyService.init();
+			));*/
+		ObjectifyService.init();
 		ObjectifyService.register(User.class);
 		ObjectifyService.register(Message.class);
 		ObjectifyService.register(UserFollowees.class);
