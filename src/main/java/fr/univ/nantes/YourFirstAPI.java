@@ -32,6 +32,12 @@ public class YourFirstAPI {
 		return UserRepository.getInstance().findUsers();
 	}
 	
+	@ApiMethod(httpMethod = HttpMethod.DELETE, path = "users")
+	public void deleteUsers() {
+		UserRepository.getInstance().deleteUsers();
+		MessageRepository.getInstance().deleteMessages();
+	}
+	
 	@ApiMethod(httpMethod = HttpMethod.GET, path = "users/{pseudo}")
 	public User getUser(@Named("pseudo") String pseudo) throws NotFoundException {
 		User user = UserRepository.getInstance().findUserByPseudo(pseudo);

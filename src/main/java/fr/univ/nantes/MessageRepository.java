@@ -3,7 +3,6 @@ package fr.univ.nantes;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
@@ -46,9 +45,14 @@ public class MessageRepository {
 		return message;
 	}
 	
-	public Collection<Message> findMessages() {
+	public List<Message> findMessages() {
 		List<Message> messages = ofy().load().type(Message.class).list();
 		return messages;
+	}
+	
+	public void deleteMessages() {
+		List<Message> messages = this.findMessages();
+		ofy().delete().entities(messages).now();
 	}
 	
 	public Message findMessage(Long id) {

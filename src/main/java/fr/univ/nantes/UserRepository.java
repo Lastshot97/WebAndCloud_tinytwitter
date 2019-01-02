@@ -34,6 +34,11 @@ public class UserRepository {
 		return user;
 	}
 	
+	public void deleteUsers() {
+		List<User> users = this.findUsers();
+		ofy().delete().entities(users).now();
+	}
+	
 	public List<User> findUsers() {
 		List<User> users = ofy().load().type(User.class).list();
 		return users;
