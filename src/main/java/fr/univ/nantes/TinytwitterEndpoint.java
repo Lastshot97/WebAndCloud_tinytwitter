@@ -7,6 +7,7 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.config.DefaultValue;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
 
 import fr.univ.nantes.model.Message;
@@ -21,9 +22,9 @@ import fr.univ.nantes.model.User;
 public class TinytwitterEndpoint {
 	
 	@ApiMethod(httpMethod = HttpMethod.PUT, path = "users/{pseudo}")
-	public User addUser(@Named("pseudo") String pseudo) throws NotFoundException {
+	public User addUser(@Named("pseudo") String pseudo) throws BadRequestException {
 		if(UserRepository.getInstance().findUserByPseudo(pseudo) != null) {
-			throw new NotFoundException(String.format("User %s already exists !", pseudo));
+			throw new BadRequestException(String.format("User %s already exists !", pseudo));
 		}
 		return UserRepository.getInstance().create(pseudo);
 	}
