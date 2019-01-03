@@ -11,7 +11,6 @@ import fr.univ.nantes.model.Message;
 import fr.univ.nantes.model.MessageReceivers;
 import fr.univ.nantes.model.MessageTags;
 import fr.univ.nantes.model.User;
-import fr.univ.nantes.model.UserFollowers;
 
 public class MessageRepository {
 
@@ -30,17 +29,7 @@ public class MessageRepository {
 		Message message = new Message(sender, body);
 		ofy().save().entity(message).now();
 		
-		Key<Message> messageKey = Key.create(Message.class, message.getId());
-		
-		UserFollowers userFollowers = ofy().load().type(UserFollowers.class).ancestor(sender).first().now();
-		List<Key<User>> followers = userFollowers.getFollowers();
-		followers.add(Key.create(User.class, sender.getPseudo()));
-		
-		MessageReceivers messageReceivers = new MessageReceivers(messageKey, message.getPublicationDate(), followers);
-		ofy().save().entity(messageReceivers).now();
-		
-		MessageTags messageTags = new MessageTags(messageKey, message.getPublicationDate());
-		ofy().save().entity(messageTags).now();
+		new CreateMessageIndexes(sender, message).run();
 		
 		return message;
 	}
@@ -64,8 +53,8 @@ public class MessageRepository {
 		List<MessageReceivers> receiversIndex = ofy().load().type(MessageReceivers.class).filter("receivers", receiver).order("-publicationDate").limit(limit).list();
 		
 		List<Key<Message>> keys = new ArrayList<Key<Message>>();
-		receiversIndex.forEach( (item) -> keys.add(item.getParent()) );
-				
+		receiversIndex.forEach( (item) -> keys.add(item.getParent()));
+		
 		List<Message> messages = new ArrayList<Message>();
 		messages.addAll(ofy().load().keys(keys).values());
 		return messages;
@@ -77,11 +66,11 @@ public class MessageRepository {
 		ofy().save().entity(tagsIndex).now();
 	}
 	
-	public List<Message> findMessageByTag(String tag) {
-		List<MessageTags> tagsIndex = ofy().load().type(MessageTags.class).filter("tags", tag).list();
+	public List<Message> findMessageByTag(String tag, int limit) {
+		List<MessageTags> tagsIndex = ofy().load().type(MessageTags.class).filter("tags", tag).order("-publicationDate").limit(limit).list();
 		
 		List<Key<Message>> keys = new ArrayList<Key<Message>>();
-		tagsIndex.forEach( (item) -> keys.add(item.getParent()) );
+		tagsIndex.forEach( (item) -> keys.add(item.getParent()));
 		
 		List<Message> messages = new ArrayList<Message>();
 		messages.addAll(ofy().load().keys(keys).values());

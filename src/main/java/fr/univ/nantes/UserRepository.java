@@ -28,9 +28,9 @@ public class UserRepository {
 		User user = new User(pseudo);
 		ofy().save().entity(user).now();
 		UserFollowers userFollowers = new UserFollowers(Key.create(User.class, user.getPseudo()));
-		ofy().save().entity(userFollowers).now();
+		ofy().save().entity(userFollowers);
 		UserFollowees userFollowees = new UserFollowees(Key.create(User.class, user.getPseudo()));
-		ofy().save().entity(userFollowees).now();
+		ofy().save().entity(userFollowees);
 		return user;
 	}
 	

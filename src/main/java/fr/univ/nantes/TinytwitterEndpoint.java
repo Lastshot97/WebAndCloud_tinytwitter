@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
+import com.google.api.server.spi.config.DefaultValue;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.NotFoundException;
 
@@ -17,7 +18,7 @@ import fr.univ.nantes.model.User;
  **/
 @Api(name = "tinytwitter",
      version = "v1")
-public class YourFirstAPI {
+public class TinytwitterEndpoint {
 	
 	@ApiMethod(httpMethod = HttpMethod.PUT, path = "users/{pseudo}")
 	public User addUser(@Named("pseudo") String pseudo) throws NotFoundException {
@@ -57,7 +58,7 @@ public class YourFirstAPI {
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.GET, path = "users/{pseudo}/timeline")
-	public List<Message> getTimeline(@Named("pseudo") String pseudo, @Named("limit") int limit) throws NotFoundException {
+	public List<Message> getTimeline(@Named("pseudo") String pseudo, @Named("limit")  @DefaultValue("10") int limit) throws NotFoundException {
 		User user = UserRepository.getInstance().findUserByPseudo(pseudo);
 		if(user == null) {
 			throw new NotFoundException(String.format("User %s doesn't exist !", pseudo));
@@ -97,8 +98,8 @@ public class YourFirstAPI {
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.GET, path = "messages")
-	public List<Message> getMessages(@Named("tag") String tag) {
-		return MessageRepository.getInstance().findMessageByTag(tag);
+	public List<Message> getMessages(@Named("tag") String tag, @Named("limit") @DefaultValue("10") int limit) {
+		return MessageRepository.getInstance().findMessageByTag(tag, limit);
 	}
 	
 	@ApiMethod(httpMethod = "patch", path = "messages/{id}")

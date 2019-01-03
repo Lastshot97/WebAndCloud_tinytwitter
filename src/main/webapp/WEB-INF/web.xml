@@ -14,7 +14,7 @@
         <!-- End of Endpoints Frameworks v2.0 -->
         <init-param>
             <param-name>services</param-name>
-            <param-value>fr.univ.nantes.YourFirstAPI</param-value>
+            <param-value>fr.univ.nantes.TinytwitterEndpoint</param-value>
         </init-param>
         <init-param>
             <param-name>restricted</param-name>

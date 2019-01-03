@@ -1,0 +1,13 @@
+indexes:
+
+- kind: MessageReceivers
+  properties:
+  - name: receivers
+  - name: publicationDate
+    direction: desc
+    
+- kind: MessageTags
+  properties:
+  - name: tags
+  - name: publicationDate
+    direction: desc
