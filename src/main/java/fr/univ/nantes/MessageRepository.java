@@ -34,14 +34,13 @@ public class MessageRepository {
 		return message;
 	}
 	
-	public List<Message> findMessages() {
-		List<Message> messages = ofy().load().type(Message.class).list();
-		return messages;
-	}
-	
 	public void deleteMessages() {
-		List<Message> messages = this.findMessages();
+		List<Message> messages = ofy().load().type(Message.class).list();
 		ofy().delete().entities(messages).now();
+		List<MessageReceivers> indexMR = ofy().load().type(MessageReceivers.class).list();
+		ofy().delete().entities(indexMR).now();
+		List<MessageTags> indexMT = ofy().load().type(MessageTags.class).list();
+		ofy().delete().entities(indexMT).now();
 	}
 	
 	public Message findMessage(Long id) {
@@ -61,9 +60,11 @@ public class MessageRepository {
 	}
 	
 	public void addTag(Message message, String tag) {
-		MessageTags tagsIndex = ofy().load().type(MessageTags.class).ancestor(message).first().now();
-		tagsIndex.addTag(tag);
-		ofy().save().entity(tagsIndex).now();
+		ofy().transact(() -> {
+			MessageTags tagsIndex = ofy().load().type(MessageTags.class).ancestor(message).first().now();
+			tagsIndex.addTag(tag);
+			ofy().save().entity(tagsIndex).now();
+		});
 	}
 	
 	public List<Message> findMessageByTag(String tag, int limit) {

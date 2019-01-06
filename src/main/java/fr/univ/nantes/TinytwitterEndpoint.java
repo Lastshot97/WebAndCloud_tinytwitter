@@ -30,8 +30,8 @@ public class TinytwitterEndpoint {
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.GET, path = "users")
-	public List<User> getUsers() {
-		return UserRepository.getInstance().findUsers();
+	public List<User> getUsers(@Named("limit") @DefaultValue("10") int limit) {
+		return UserRepository.getInstance().findUsers(limit);
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.DELETE, path = "users")
@@ -50,7 +50,8 @@ public class TinytwitterEndpoint {
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.POST, path = "users/{pseudo}/timeline")
-	public Message postMessage(@Named("pseudo") String pseudo, @Named("message") String messageBody) throws NotFoundException {
+	public Message postMessage(@Named("pseudo") String pseudo, @Named("message") String messageBody) 
+			throws NotFoundException {
 		User user = UserRepository.getInstance().findUserByPseudo(pseudo);
 		if(user == null) {
 			throw new NotFoundException(String.format("User %s doesn't exist !", pseudo));
@@ -59,7 +60,8 @@ public class TinytwitterEndpoint {
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.GET, path = "users/{pseudo}/timeline")
-	public List<Message> getTimeline(@Named("pseudo") String pseudo, @Named("limit")  @DefaultValue("10") int limit) throws NotFoundException {
+	public List<Message> getTimeline(@Named("pseudo") String pseudo, @Named("limit")  @DefaultValue("10") int limit) 
+			throws NotFoundException {
 		User user = UserRepository.getInstance().findUserByPseudo(pseudo);
 		if(user == null) {
 			throw new NotFoundException(String.format("User %s doesn't exist !", pseudo));
@@ -85,17 +87,32 @@ public class TinytwitterEndpoint {
 		return UserRepository.getInstance().getFollowees(user);
 	}
 	
-	@ApiMethod(httpMethod = HttpMethod.PUT, path = "users/{follower}/followees/{followee}")
-	public void addFollower(@Named("follower") String pseudo1, @Named("followee") String pseudo2) throws NotFoundException {
-		User follower = UserRepository.getInstance().findUserByPseudo(pseudo1);
-		User followee = UserRepository.getInstance().findUserByPseudo(pseudo2);
-		if(follower == null) {
-			throw new NotFoundException(String.format("User %s doesn't exist !", pseudo1));
+	@ApiMethod(httpMethod = HttpMethod.PUT, path = "users/{user}/followees/{followee}")
+	public void addFollowee(@Named("user") String userPseudo, @Named("followee") String followeePseudo) 
+			throws NotFoundException {
+		User user = UserRepository.getInstance().findUserByPseudo(userPseudo);
+		User followee = UserRepository.getInstance().findUserByPseudo(followeePseudo);
+		if(user == null) {
+			throw new NotFoundException(String.format("User %s doesn't exist !", userPseudo));
 		} else if(followee == null) {
-			throw new NotFoundException(String.format("User %s doesn't exist !", pseudo2));
+			throw new NotFoundException(String.format("User %s doesn't exist !", followeePseudo));
 		}
-		UserRepository.getInstance().addFollowee(follower, followee);
-		UserRepository.getInstance().addFollower(followee, follower);
+		UserRepository.getInstance().addFollowee(user, followee);
+		UserRepository.getInstance().addFollower(followee, user);
+	}
+	
+	@ApiMethod(httpMethod = HttpMethod.PUT, path = "users/{user}/followers/{follower}")
+	public void addFollower(@Named("user") String userPseudo, @Named("follower") String followerPseudo) 
+			throws NotFoundException {
+		User user = UserRepository.getInstance().findUserByPseudo(userPseudo);
+		User follower = UserRepository.getInstance().findUserByPseudo(followerPseudo);
+		if(user == null) {
+			throw new NotFoundException(String.format("User %s doesn't exist !", userPseudo));
+		} else if(follower == null) {
+			throw new NotFoundException(String.format("User %s doesn't exist !", followerPseudo));
+		}
+		UserRepository.getInstance().addFollower(user, follower);
+		UserRepository.getInstance().addFollowee(follower, user);
 	}
 	
 	@ApiMethod(httpMethod = HttpMethod.GET, path = "messages")
